@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Area Profile — Jan Drishti</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header" id="site-header"></header>
+
+<section class="section-tight">
+  <div class="wrap">
+
+    <!-- ===== Area header ===== -->
+    <div class="grid" style="grid-template-columns:1fr auto;gap:24px;align-items:center;" id="areaHead"></div>
+
+    <div class="grid" style="grid-template-columns:1fr 1.4fr;gap:32px;margin-top:32px;align-items:start;">
+      <div class="card reveal in" style="text-align:center;">
+        <span class="tiny faint" style="text-transform:uppercase;letter-spacing:.08em;">Civic Health</span>
+        <div class="flex-center mt-12" id="areaRing"></div>
+        <div class="delta mt-8" id="areaDelta" style="display:inline-block;"></div>
+        <hr class="divider">
+        <div class="flex gap-12">
+          <a href="report.html" class="btn btn-saffron btn-block" id="reportBtn">Report Issue</a>
+        </div>
+        <a href="#activeIssues" class="btn btn-outline btn-block mt-12">View Active Issues</a>
+      </div>
+
+      <div class="card reveal in">
+        <h3 class="mb-16" style="font-size:16px;">Category breakdown</h3>
+        <div id="catBars"></div>
+      </div>
+    </div>
+
+    <!-- ===== Overview stats ===== -->
+    <div class="section-head mt-40 reveal" id="overviewHead"></div>
+    <div class="grid grid-4 reveal" id="overviewStats"></div>
+
+    <!-- ===== Top priorities ===== -->
+    <div class="mt-40 reveal">
+      <h3 class="mb-16" style="font-size:18px;">Top Priorities</h3>
+      <div class="grid grid-3" id="priorities"></div>
+    </div>
+
+    <!-- ===== Trend ===== -->
+    <div class="grid mt-40" style="grid-template-columns:1.4fr 1fr;gap:32px;align-items:start;">
+      <div class="card reveal in">
+        <div class="flex-between mb-8">
+          <h3 style="font-size:16px;">Civic Health Trend</h3>
+          <span class="delta up" id="trendDelta"></span>
+        </div>
+        <div id="trendBox"></div>
+      </div>
+
+      <div class="card reveal in" id="pollBox"></div>
+    </div>
+
+    <!-- ===== Active issues ===== -->
+    <div class="mt-40 reveal" id="activeIssues">
+      <div class="flex-between mb-16">
+        <h3 style="font-size:18px;">Active Issues</h3>
+        <a href="issues.html" class="small bold" style="color:var(--green-ink);">View all →</a>
+      </div>
+      <div class="grid grid-3" id="issuesGrid"></div>
+    </div>
+
+    <!-- ===== What's changed ===== -->
+    <div class="grid mt-40" style="grid-template-columns:1fr 1fr;gap:32px;align-items:start;">
+      <div class="card reveal in">
+        <h3 class="mb-16" style="font-size:16px;">Recent Improvements</h3>
+        <ul class="stack gap-12" id="improvements"></ul>
+        <p class="small bold mt-16" style="color:var(--green-ink);">Your area is improving.</p>
+      </div>
+      <div class="card reveal in">
+        <h3 class="mb-16" style="font-size:16px;">Civic Alerts</h3>
+        <ul class="stack gap-10" id="alerts"></ul>
+        <div id="noAlerts" class="muted small hidden">No active alerts for this area right now.</div>
+      </div>
+    </div>
+
+    <!-- ===== Nearby services ===== -->
+    <div class="mt-40 reveal">
+      <h3 class="mb-16" style="font-size:16px;">Nearby Public Services <span class="tiny faint">(prototype data)</span></h3>
+      <div class="grid grid-4" id="nearby"></div>
+    </div>
+
+  </div>
+</section>
+
+<footer class="site-footer" id="site-footer"></footer>
+<nav class="bottom-nav" id="bottom-nav"></nav>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+  renderChrome('areas');
+  const area = findArea(qs('id')) || AREAS[0];
+  document.title = `${area.name} — Jan Drishti`;
+
+  document.getElementById('areaHead').innerHTML = `
+    <div>
+      <span class="faint small">${area.city}</span>
+      <h1 style="font-size:clamp(28px,4vw,38px);font-weight:800;margin-top:4px;">${area.name}</h1>
+    </div>
+    <span class="status ${scoreTone(area.score)}" style="font-size:14px;padding:8px 16px;">${scoreTone(area.score)==='green'?'Healthy':scoreTone(area.score)==='orange'?'Needs Attention':'Critical'}</span>
+  `;
+  document.getElementById('areaRing').innerHTML = ringGauge({score:area.score, size:160, stroke:13, label:'/ 100'});
+  const dEl = document.getElementById('areaDelta');
+  dEl.textContent = `${area.delta>=0?'+':''}${area.delta} this month`;
+  dEl.classList.add(area.delta>=0?'up':'down');
+  document.getElementById('reportBtn').href = `report.html?area=${area.id}`;
+
+  document.getElementById('catBars').innerHTML = categoryBars(area.categories);
+
+  document.getElementById('overviewHead').innerHTML = `<h2 style="font-size:24px;">What's happening in ${area.name}?</h2>`;
+  const areaIssues = issuesForArea(area.id);
+  const overview = [
+    [String(areaIssues.length + area.resolvedThisMonth), "Issues Reported"],
+    [String(area.resolvedThisMonth), "Issues Resolved"],
+    [String(area.citizens), "Citizens Participating"],
+    [area.impacted, "People Potentially Impacted"]
+  ];
+  document.getElementById('overviewStats').innerHTML = overview.map(([num,lbl])=>`
+    <div class="card" style="text-align:center;">
+      <span class="mono bold" style="font-size:26px;">${num}</span>
+      <div class="tiny faint mt-8">${lbl}</div>
+    </div>`).join('');
+
+  // top priorities = 3 lowest-scoring categories
+  const sortedCats = Object.entries(area.categories).sort((a,b)=>a[1]-b[1]).slice(0,3);
+  document.getElementById('priorities').innerHTML = sortedCats.map(([key,val],i)=>{
+    const meta = CATEGORY_META[key];
+    const relatedCount = areaIssues.filter(is=>is.category===key).length || (i+2);
+    return `
+    <div class="card">
+      <span class="mono faint tiny">PRIORITY ${i+1}</span>
+      <h4 style="font-size:16px;margin-top:6px;">${meta.label}</h4>
+      <span class="mono bold tone-${scoreTone(val)}" style="font-size:22px;">${val}/100</span>
+      <p class="small muted mt-8">${relatedCount} ${relatedCount===1?'issue needs':'issues need'} attention</p>
+      <a href="issues.html?area=${area.id}&category=${key}" class="btn btn-outline btn-sm btn-block mt-16">View Issues</a>
+    </div>`;
+  }).join('');
+
+  document.getElementById('trendBox').innerHTML = trendChart(area.trend);
+  const first = area.trend[0][1], last = area.trend[area.trend.length-1][1];
+  document.getElementById('trendDelta').textContent = `+${last-first} points since ${area.trend[0][0]}`;
+
+  const poll = POLLS[area.id];
+  const pollBox = document.getElementById('pollBox');
+  if(poll){
+    pollBox.innerHTML = `
+      <h3 class="mb-16" style="font-size:16px;">${poll.question}</h3>
+      <div class="stack gap-14" id="pollOptions"></div>
+      <p class="tiny faint mt-16">Community poll · prototype data</p>`;
+    document.getElementById('pollOptions').innerHTML = poll.options.map(([label,pct])=>`
+      <div>
+        <div class="flex-between tiny mb-4"><span class="bold">${label}</span><span class="mono">${pct}%</span></div>
+        <div class="cat-track" style="height:9px;"><div class="cat-fill" style="width:${pct}%;background:var(--green);"></div></div>
+      </div>`).join('');
+  } else {
+    pollBox.innerHTML = `
+      <h3 class="mb-16" style="font-size:16px;">Suggest an improvement</h3>
+      <p class="small muted">Have an idea for ${area.name}? Community suggestions with the most support get flagged as area priorities.</p>
+      <a href="impact.html#suggestions" class="btn btn-outline btn-sm mt-16">Suggest an idea</a>`;
+  }
+
+  const issuesGrid = document.getElementById('issuesGrid');
+  const activeArr = areaIssues.filter(i=>!i.resolved);
+  issuesGrid.innerHTML = activeArr.length ? activeArr.map(issueCard).join('') : `<p class="muted small">No active issues reported in ${area.name} right now.</p>`;
+  issuesGrid.addEventListener('click', (e)=>{
+    const card = e.target.closest('.issue-card');
+    if(card) location.href = `issues.html?issue=${card.dataset.id}`;
+  });
+
+  document.getElementById('improvements').innerHTML = area.improvements.length
+    ? area.improvements.map(t=>`<li class="flex gap-10 small" style="align-items:flex-start;"><span style="color:var(--green-ink);flex-shrink:0;">✓</span><span>${t}</span></li>`).join('')
+    : `<li class="muted small">No recent improvements logged yet.</li>`;
+
+  const alertsList = document.getElementById('alerts');
+  if(area.alerts.length){
+    alertsList.innerHTML = area.alerts.map(a=>`
+      <li class="flex gap-10" style="align-items:flex-start;padding:10px;background:var(--${a.tone}-tint);border-radius:10px;">
+        <span class="status ${a.tone}" style="flex-shrink:0;"></span>
+        <span class="small">${a.text}</span>
+      </li>`).join('');
+  } else {
+    document.getElementById('noAlerts').classList.remove('hidden');
+  }
+
+  document.getElementById('nearby').innerHTML = Object.entries(area.nearby).map(([cat,list])=>`
+    <div class="card" style="padding:16px;">
+      <span class="tiny bold faint" style="text-transform:uppercase;letter-spacing:.05em;">${cat}</span>
+      <ul class="stack gap-6 mt-12 small">${list.map(n=>`<li>${n}</li>`).join('')}</ul>
+    </div>`).join('');
+
+  animateRings(); animateBars(); initReveal();
+</script>
+</body>
+</html>

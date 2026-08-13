@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Civic Issues — Jan Drishti</title>
+<link rel="stylesheet" href="css/style.css">
+
+<style>
+  .modal-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(23,33,27,.55);
+    z-index:300;
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+  }
+
+  @media (min-width:720px){
+    .modal-overlay{
+      align-items:center;
+    }
+  }
+
+  .modal-box{
+    background:var(--bg-raised);
+    width:100%;
+    max-width:560px;
+    max-height:92vh;
+    overflow-y:auto;
+    border-radius:24px 24px 0 0;
+    padding:26px;
+  }
+
+  @media (min-width:720px){
+    .modal-box{
+      border-radius:24px;
+    }
+  }
+
+  .timeline-step{
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+  }
+
+  .timeline-dot{
+    width:22px;
+    height:22px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    margin-top:1px;
+    background:var(--line-soft);
+    color:var(--ink-faint);
+  }
+
+  .timeline-dot.done{
+    background:var(--green);
+    color:#fff;
+  }
+
+  .timeline-dot.now{
+    background:var(--saffron);
+    color:#fff;
+  }
+
+  .timeline-line{
+    width:2px;
+    flex:1;
+    background:var(--line);
+    margin:2px 0 2px 10px;
+    min-height:20px;
+  }
+</style>
+</head>
+
+<body>
+
+<header class="site-header" id="site-header"></header>
+
+<section class="section-tight">
+  <div class="wrap">
+
+    <div class="section-head reveal in">
+      <span class="eyebrow">Issues</span>
+      <h2>Civic Issues</h2>
+      <p>See what's happening across Kanpur.</p>
+    </div>
+
+    <div class="card" style="padding:16px;margin-bottom:24px;">
+
+      <input
+        id="searchBox"
+        type="text"
+        placeholder="Search issue..."
+        style="width:100%;border:1px solid var(--line);border-radius:var(--r-pill);padding:11px 18px;font-size:14.5px;font-family:inherit;background:var(--bg);margin-bottom:14px;"
+      >
+
+      <div
+        class="flex gap-8"
+        id="statusFilters"
+        style="flex-wrap:wrap;"
+      ></div>
+
+    </div>
+
+    <div class="grid grid-3" id="issuesGrid"></div>
+
+    <p
+      id="emptyState"
+      class="muted small hidden"
+      style="text-align:center;padding:40px 0;"
+    >
+      No issues match your filters.
+    </p>
+
+  </div>
+</section>
+
+<div id="modalRoot"></div>
+
+<footer class="site-footer" id="site-footer"></footer>
+<nav class="bottom-nav" id="bottom-nav"></nav>
+
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+
+<script>
+
+  renderChrome('issues');
+
+
+  /* =========================
+     FILTERS
+  ========================= */
+
+  const filters = [
+    ["all","All"],
+    ["critical","Critical"],
+    ["high","High Priority"],
+    ["active","Active"],
+    ["resolved","Resolved"]
+  ];
+
+  const filterWrap = document.getElementById('statusFilters');
+
+  filterWrap.innerHTML = filters.map(([k,l],i)=>`
+    <button
+      class="btn btn-sm ${i===0?'btn-ghost':'btn-outline'}"
+      data-f="${k}"
+      style="padding:7px 13px;"
+    >
+      ${l}
+    </button>
+  `).join('');
+
+
+  let activeFilter = 'all';
+
+
+  filterWrap.querySelectorAll('button').forEach(btn=>{
+
+    btn.addEventListener('click', ()=>{
+
+      filterWrap.querySelectorAll('button').forEach(b=>{
+        b.classList.remove('btn-ghost');
+        b.classList.add('btn-outline');
+      });
+
+      btn.classList.remove('btn-outline');
+      btn.classList.add('btn-ghost');
+
+      activeFilter = btn.dataset.f;
+
+      renderGrid();
+
+    });
+
+  });
+
+
+  /* =========================
+     SEARCH / FILTER
+  ========================= */
+
+  const preArea = qs('area');
+  const preCategory = qs('category');
+
+  const grid = document.getElementById('issuesGrid');
+  const empty = document.getElementById('emptyState');
+
+
+  function renderGrid(){
+
+    const q = document
+      .getElementById('searchBox')
+      .value
+      .trim()
+      .toLowerCase();
+
+
+    let list = ISSUES.filter(i=>{
+
+      if(preArea && i.area !== preArea)
+        return false;
+
+      if(preCategory && i.category !== preCategory)
+        return false;
+
+      if(q && !i.title.toLowerCase().includes(q))
+        return false;
+
+      if(activeFilter === 'critical')
+        return i.priority >= 80 && !i.resolved;
+
+      if(activeFilter === 'high')
+        return i.priority >= 55 &&
+               i.priority < 80 &&
+               !i.resolved;
+
+      if(activeFilter === 'active')
+        return !i.resolved;
+
+      if(activeFilter === 'resolved')
+        return i.resolved;
+
+      return true;
+
+    }).sort((a,b)=>b.priority-a.priority);
+
+
+    grid.innerHTML = list.map(issueCard).join('');
+
+    empty.classList.toggle(
+      'hidden',
+      list.length > 0
+    );
+
+  }
+
+
+  document
+    .getElementById('searchBox')
+    .addEventListener('input', renderGrid);
+
+
+  /* =========================
+     OPEN ISSUE POPUP
+  ========================= */
+
+  grid.addEventListener('click', e=>{
+
+    const card = e.target.closest('.issue-card');
+
+    if(card)
+      openModal(card.dataset.id);
+
+  });
+
+
+  /* =========================
+     TIMELINE
+  ========================= */
+
+  const TIMELINE_STEPS = [
+    ["reported","Reported"],
+    ["verified","Community Verified"],
+    ["assigned","Assigned"],
+    ["progress","Work in Progress"],
+    ["resolved","Resolved"]
+  ];
+
+
+  /* =========================
+     ISSUE MODAL
+  ========================= */
+
+  function openModal(id){
+
+    const iss = findIssue(id);
+    const area = findArea(iss.area);
+
+    const root =
+      document.getElementById('modalRoot');
+
+    const confirmed =
+      isConfirmed(iss.id);
+
+
+    /* Timeline */
+
+    const timelineHtml =
+      TIMELINE_STEPS.map(([key,label],i)=>{
+
+        const done =
+          iss.timeline.includes(key);
+
+        const isNow =
+          done &&
+          iss.timeline[iss.timeline.length-1] === key &&
+          key !== 'resolved';
+
+
+        return `
+          <div class="timeline-step">
+
+            <div class="stack" style="align-items:center;">
+
+              <div class="timeline-dot ${done ? (isNow ? 'now' : 'done') : ''}">
+                ${done ? (key === 'resolved' ? icon('check') : '●') : ''}
+              </div>
+
+              ${
+                i < TIMELINE_STEPS.length - 1
+                ? '<div class="timeline-line"></div>'
+                : ''
+              }
+
+            </div>
+
+            <div style="padding-bottom:18px;">
+
+              <span
+                class="small bold"
+                style="color:${done ? 'var(--ink)' : 'var(--ink-faint)'};"
+              >
+                ${label}
+              </span>
+
+            </div>
+
+          </div>
+        `;
+
+      }).join('');
+
+
+    /* =========================
+       MODAL HTML
+    ========================= */
+
+    root.innerHTML = `
+
+      <div class="modal-overlay" id="modalOverlay">
+
+        <div class="modal-box">
+
+
+          <!-- Category + Close -->
+
+          <div class="flex-between mb-16">
+
+            <span class="tag">
+              ${CATEGORY_META[iss.category].label}
+            </span>
+
+            <button
+              class="btn btn-ghost btn-sm"
+              id="closeModal"
+            >
+              Close
+            </button>
+
+          </div>
+
+
+          <!-- MAIN ISSUE IMAGE -->
+
+          <div
+            style="height:200px;border-radius:14px;overflow:hidden;"
+          >
+
+            <img
+              src="${iss.photo}"
+              alt="${iss.title}"
+              style="width:100%;height:100%;object-fit:cover;display:block;"
+            >
+
+          </div>
+
+
+          <!-- TITLE -->
+
+          <h2
+            class="mt-16"
+            style="font-size:22px;"
+          >
+            ${iss.title}
+          </h2>
+
+
+          <!-- LOCATION -->
+
+          <span class="small muted">
+            ${iss.location}, ${area.name}
+          </span>
+
+
+          <!-- PRIORITY + STATUS -->
+
+          <div class="flex gap-16 mt-12">
+
+            <span
+              class="mono bold tone-${scoreTone(iss.priority)}"
+              style="font-size:20px;"
+            >
+              ${iss.priority}/100
+            </span>
+
+            <span
+              class="status ${STATUS_TONE[iss.status]}"
+            >
+              ${STATUS_LABEL[iss.status]}
+            </span>
+
+          </div>
+
+
+          <!-- DESCRIPTION -->
+
+          <p class="small muted mt-16">
+            ${iss.description}
+          </p>
+
+
+          <!-- CONFIRMATIONS -->
+
+          <div class="flex gap-24 mt-16 small">
+
+            <span>
+              <strong>${iss.confirms}</strong>
+              confirmations
+            </span>
+
+            <span class="muted">
+              Affects: ${iss.affected || '—'}
+            </span>
+
+          </div>
+
+
+          <hr class="divider">
+
+
+          <!-- TIMELINE -->
+
+          <h4
+            class="mb-16"
+            style="font-size:14.5px;"
+          >
+            Timeline
+          </h4>
+
+          ${timelineHtml}
+
+
+          ${
+            iss.resolved
+
+            ? `
+
+              <!-- =====================
+                   BEFORE / AFTER
+              ====================== -->
+
+              <hr class="divider">
+
+              <h4
+                class="mb-16"
+                style="font-size:14.5px;"
+              >
+                Before / After
+              </h4>
+
+
+              <div
+                class="grid grid-2"
+                style="gap:12px;"
+              >
+
+                <div>
+
+                  <div
+                    style="height:200px;border-radius:14px;overflow:hidden;"
+                  >
+                    ${photoSvg(
+                      iss.photo + '-before',
+                      iss.category
+                    )}
+                  </div>
+
+                  <span
+                    class="tiny faint mt-8"
+                    style="display:block;text-align:center;"
+                  >
+                    BEFORE
+                  </span>
+
+                </div>
+
+
+                <div>
+
+                  <div
+                    style="height:120px;border-radius:12px;overflow:hidden;"
+                  >
+                    ${photoSvg(
+                      iss.photo + '-after',
+                      'cleanliness'
+                    )}
+                  </div>
+
+                  <span
+                    class="tiny faint mt-8"
+                    style="display:block;text-align:center;"
+                  >
+                    AFTER
+                  </span>
+
+                </div>
+
+              </div>
+
+
+              <p class="small muted mt-12">
+                ${iss.resolvedNote || ''}
+              </p>
+
+
+              <span
+                class="status green mt-8"
+                style="display:inline-flex;"
+              >
+                Resolution verified by ${iss.confirms} citizens
+              </span>
+
+            `
+
+            : `
+
+              <!-- =====================
+                   CONFIRM ISSUE
+              ====================== -->
+
+              <hr class="divider">
+
+              <button
+                class="btn ${confirmed ? 'btn-ghost' : 'btn-primary'} btn-block"
+                id="confirmBtn"
+                ${confirmed ? 'disabled' : ''}
+              >
+                ${
+                  confirmed
+                  ? '✓ You confirmed this issue'
+                  : 'I SEE THIS TOO'
+                }
+              </button>
+
+            `
+          }
+
+
+        </div>
+
+      </div>
+
+    `;
+
+
+    /* =========================
+       CLOSE MODAL
+    ========================= */
+
+    document
+      .getElementById('closeModal')
+      .addEventListener('click', ()=>{
+        root.innerHTML = '';
+      });
+
+
+    document
+      .getElementById('modalOverlay')
+      .addEventListener('click', e=>{
+
+        if(e.target.id === 'modalOverlay')
+          root.innerHTML = '';
+
+      });
+
+
+    /* =========================
+       CONFIRM ISSUE
+    ========================= */
+
+    const cb =
+      document.getElementById('confirmBtn');
+
+
+    if(cb){
+
+      cb.addEventListener('click', ()=>{
+
+        confirmIssue(iss.id);
+
+        openModal(iss.id);
+
+        renderGrid();
+
+      });
+
+    }
+
+  }
+
+
+  /* =========================
+     OPEN DIRECT ISSUE
+  ========================= */
+
+  const preIssue = qs('issue');
+
+  renderGrid();
+
+  if(preIssue)
+    openModal(preIssue);
+
+
+  initReveal();
+
+</script>
+
+</body>
+</html>

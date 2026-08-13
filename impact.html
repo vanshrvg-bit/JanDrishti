@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>See the Change — Jan Drishti</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header" id="site-header"></header>
+
+<section class="section-tight">
+  <div class="wrap">
+    <div class="section-head reveal in">
+      <span class="eyebrow">Impact</span>
+      <h2>See the Change</h2>
+      <p>Every report, confirmation and resolution contributes to a better neighbourhood.</p>
+    </div>
+
+    <div class="grid" style="grid-template-columns:1fr 1.6fr;gap:32px;align-items:center;">
+      <div class="card reveal in" style="text-align:center;">
+        <span class="tiny faint" style="text-transform:uppercase;letter-spacing:.08em;">Kanpur Civic Score</span>
+        <div class="flex-center mt-12" id="cityRing"></div>
+      </div>
+      <div class="card reveal in">
+        <div class="flex-between mb-8"><h3 style="font-size:16px;">City-wide trend</h3><span class="delta up">+15 points since May</span></div>
+        <div id="cityTrend"></div>
+      </div>
+    </div>
+
+    <div class="grid grid-4 mt-32 reveal" id="impactStats"></div>
+  </div>
+</section>
+
+<!-- ===== leaderboard + most improved ===== -->
+<section class="section-tight" style="background:var(--bg-raised);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+  <div class="wrap">
+    <div class="grid grid-2" style="gap:32px;">
+      <div class="reveal">
+        <h3 class="mb-16" style="font-size:18px;">Neighbourhoods Leading the Way</h3>
+        <div class="card stack" id="leaderList"></div>
+      </div>
+      <div class="reveal">
+        <h3 class="mb-16" style="font-size:18px;">Most Improved Areas</h3>
+        <div class="card stack" id="improvedList"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Azadi challenge ===== -->
+<section class="section" id="azadi">
+  <div class="wrap">
+    <div class="card reveal in" style="padding:32px;background:linear-gradient(135deg, var(--saffron-tint), var(--green-tint));border:none;">
+      <span class="eyebrow saffron">🇮🇳 Azadi Civic Challenge</span>
+      <h2 class="mt-12" style="font-size:26px;">75 Actions for a Better India</h2>
+      <div class="flex-between mt-20 mb-8">
+        <span class="mono bold" style="font-size:24px;" id="azadiCount"></span>
+        <span class="muted small">actions completed</span>
+      </div>
+      <div class="cat-track" style="height:14px;"><div class="cat-fill" id="azadiBar" style="width:0%;background:linear-gradient(90deg,var(--saffron),var(--green));"></div></div>
+      <div class="grid grid-3 mt-24" id="azadiActions" style="gap:12px;"></div>
+      <p class="bold mt-24" style="font-size:15px;">75 actions. 75 citizens. One stronger community.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== citizen profile ===== -->
+<section class="section-tight">
+  <div class="wrap">
+    <div class="grid" style="grid-template-columns:1fr 1.4fr;gap:32px;align-items:start;">
+      <div class="card reveal in">
+        <h3 style="font-size:17px;">My Civic Impact</h3>
+        <div class="flex gap-16 mt-16" style="align-items:center;">
+          <span class="mono bold" style="font-size:34px;" id="myPoints"></span>
+          <span class="tag" id="myBadge"></span>
+        </div>
+        <hr class="divider">
+        <div class="stack gap-10 small" id="myActivity"></div>
+      </div>
+      <div class="reveal">
+        <h3 class="mb-16" style="font-size:17px;">Badges</h3>
+        <div class="grid grid-4" id="badgeGrid" style="gap:12px;"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== suggestions ===== -->
+<section class="section-tight" id="suggestions" style="background:var(--bg-raised);border-top:1px solid var(--line);">
+  <div class="wrap">
+    <div class="flex-between mb-16" style="flex-wrap:wrap;gap:12px;">
+      <h3 style="font-size:18px;">Suggest an Improvement</h3>
+      <button class="btn btn-outline btn-sm" id="addSuggestionBtn">+ New suggestion</button>
+    </div>
+    <div class="stack gap-12" id="suggestionList"></div>
+  </div>
+</section>
+
+<!-- ===== about ===== -->
+<section class="section" id="about">
+  <div class="wrap">
+    <div class="grid" style="grid-template-columns:1fr 1fr;gap:32px;">
+      <div class="reveal">
+        <span class="eyebrow blue">About</span>
+        <h2 class="mt-12" style="font-size:26px;">Why Jan Drishti</h2>
+        <p class="muted mt-12">Jan Drishti was built for the "Code for the Nation" thematic competition to reimagine civic reporting as a shared, measurable neighbourhood health profile — not a one-way complaint box. It combines a civic dashboard, an interactive city map, and a community verification system so citizens can see the effect of collective action, not just file a ticket and wait.</p>
+      </div>
+      <div class="reveal">
+        <span class="eyebrow">Prototype note</span>
+        <h2 class="mt-12" style="font-size:26px;">About this data</h2>
+        <p class="muted mt-12">All scores, issues, citizen counts and photos on this site are illustrative demo data generated for the prototype. Civic Priority Scores are a Jan Drishti prototype estimate — not an official government algorithm — used here to demonstrate how reported issues could be triaged.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer" id="site-footer"></footer>
+<nav class="bottom-nav" id="bottom-nav"></nav>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+  renderChrome('impact');
+
+  document.getElementById('cityRing').innerHTML = ringGauge({score:CITY.score, size:150, stroke:12, label:'/ 100'});
+  document.getElementById('cityTrend').innerHTML = trendChart([["May",69],["Jun",72],["Jul",75],["Aug",CITY.score+6>84?84:CITY.score+6]]);
+
+  document.getElementById('impactStats').innerHTML = [
+    [IMPACT_STATS.citizensInvolved.toLocaleString(), "Citizens involved"],
+    [IMPACT_STATS.issuesResolved.toLocaleString(), "Issues resolved"],
+    [IMPACT_STATS.peopleImpacted, "People potentially impacted"],
+    [IMPACT_STATS.communityActions.toLocaleString(), "Community actions"]
+  ].map(([num,lbl])=>`
+    <div class="card" style="text-align:center;">
+      <span class="mono bold" style="font-size:26px;">${num}</span>
+      <div class="tiny faint mt-8">${lbl}</div>
+    </div>`).join('');
+
+  document.getElementById('leaderList').innerHTML = LEADERBOARD.map((a,i)=>`
+    <a href="area.html?id=${a.id}" class="flex-between" style="padding:12px 4px;border-bottom:1px solid var(--line-soft);text-decoration:none;color:inherit;">
+      <span class="flex gap-12" style="align-items:center;">
+        <span class="mono faint" style="width:20px;">${i+1}</span>
+        <span class="bold">${a.name}</span>
+      </span>
+      <span class="mono bold tone-${scoreTone(a.score)}">${a.score}</span>
+    </a>`).join('');
+
+  document.getElementById('improvedList').innerHTML = MOST_IMPROVED.map(a=>`
+    <a href="area.html?id=${a.id}" class="flex-between" style="padding:12px 4px;border-bottom:1px solid var(--line-soft);text-decoration:none;color:inherit;">
+      <span class="bold">${a.name}</span>
+      <span class="delta up">↑ +${a.delta} points</span>
+    </a>`).join('');
+
+  document.getElementById('azadiCount').textContent = `${STATE.azadi} / 75`;
+  const azadiActionsList = ["Report a civic issue","Verify an existing issue","Support a community improvement","Report waste","Report broken streetlight","Suggest a civic improvement"];
+  document.getElementById('azadiActions').innerHTML = azadiActionsList.map(a=>`
+    <div class="flex gap-10 small" style="align-items:center;background:rgba(255,255,255,.6);padding:10px 12px;border-radius:10px;">
+      <span style="color:var(--green-ink);">✓</span><span>${a}</span>
+    </div>`).join('');
+
+  document.getElementById('myPoints').textContent = STATE.points + ' pts';
+  document.getElementById('myBadge').textContent = STATE.badges[0];
+  document.getElementById('myActivity').innerHTML = `
+    <div class="flex-between"><span class="muted">Issues reported</span><span class="bold">${STATE.reported}</span></div>
+    <div class="flex-between"><span class="muted">Issues confirmed</span><span class="bold">${STATE.confirmedCount}</span></div>
+    <div class="flex-between"><span class="muted">Resolutions verified</span><span class="bold">${STATE.verified}</span></div>
+  `;
+  const badges = [
+    ["Civic Champion","flag"], ["Road Watcher","road"], ["Green Guardian","leaf"], ["Community Contributor","user"]
+  ];
+  document.getElementById('badgeGrid').innerHTML = badges.map(([name,ic])=>`
+    <div class="card" style="text-align:center;padding:16px;">
+      <div class="badge-icon" style="margin:0 auto 10px;">${icon(ic)}</div>
+      <span class="tiny bold">${name}</span>
+    </div>`).join('');
+
+  function renderSuggestions(){
+    document.getElementById('suggestionList').innerHTML = SUGGESTIONS.map(s=>{
+      const area = findArea(s.area);
+      const supported = !!STATE.confirmed['sugg-'+s.id];
+      return `
+      <div class="card flex-between" style="align-items:center;flex-wrap:wrap;gap:12px;">
+        <div>
+          <span class="tag">${area.name}</span>
+          <p class="small mt-8" style="max-width:420px;">${s.text}</p>
+        </div>
+        <div class="stack gap-8" style="align-items:flex-end;">
+          <span class="small muted">${s.support} people support this</span>
+          <button class="btn ${supported?'btn-ghost':'btn-outline'} btn-sm" data-id="${s.id}" ${supported?'disabled':''}>${supported?'✓ Supported':'Support'}</button>
+        </div>
+      </div>`;
+    }).join('');
+    document.querySelectorAll('#suggestionList button[data-id]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const s = SUGGESTIONS.find(x=>x.id===btn.dataset.id);
+        if(STATE.confirmed['sugg-'+s.id]) return;
+        STATE.confirmed['sugg-'+s.id] = true; s.support += 1; STATE.points += 3; saveState(STATE);
+        renderSuggestions();
+      });
+    });
+  }
+  renderSuggestions();
+
+  document.getElementById('addSuggestionBtn').addEventListener('click', ()=>{
+    const text = prompt("What would you like to suggest for your area?");
+    if(text && text.trim()){
+      SUGGESTIONS.unshift({ id:'s'+Date.now(), area: AREAS[0].id, text: text.trim(), support: 1 });
+      renderSuggestions();
+    }
+  });
+
+  animateRings(); initReveal();
+</script>
+</body>
+</html>

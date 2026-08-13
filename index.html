@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jan Drishti — See Your Area. Shape Your City.</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header" id="site-header"></header>
+
+<!-- header -->
+<section class="section" style="padding-top:56px;padding-bottom:60px;">
+  <div class="wrap">
+    <div class="grid grid-2" style="align-items:center;gap:48px;">
+      <div class="stack gap-16 reveal">
+        <span class="eyebrow saffron">🇮🇳 Code for the Nation — Civic Health Platform</span>
+        <h1 style="font-size:clamp(38px,5.4vw,58px);font-weight:800;line-height:1.05;">
+          See Your Area.<br>Shape Your City.
+        </h1>
+        <p class="muted" style="font-size:17px;max-width:480px;">
+          Explore the civic health of your neighbourhood, report what needs attention, and see how collective action creates change — one locality at a time.
+        </p>
+        <div class="flex gap-12 mt-8" style="flex-wrap:wrap;">
+          <a href="areas.html" class="btn btn-primary">Explore Your Area</a>
+          <a href="report.html" class="btn btn-saffron">Report an Issue</a>
+        </div>
+        <div class="flex gap-24 mt-24" style="flex-wrap:wrap;">
+          <div><span class="mono bold" style="font-size:22px;">128</span><br><span class="tiny faint">Active issues</span></div>
+          <div><span class="mono bold" style="font-size:22px;">94</span><br><span class="tiny faint">Resolved</span></div>
+          <div><span class="mono bold" style="font-size:22px;">642</span><br><span class="tiny faint">Citizens participating</span></div>
+        </div>
+      </div>
+
+      <div class="reveal">
+        <div class="card" style="padding:22px;box-shadow:var(--shadow-lg);">
+          <div class="flex-between mb-16">
+            <div>
+              <span class="tiny faint" style="text-transform:uppercase;letter-spacing:.08em;">Civic Health Profile</span>
+              <h3 style="font-size:20px;margin-top:2px;">Kalyanpur</h3>
+            </div>
+            <span class="status green">Healthy</span>
+          </div>
+          <div class="flex-between" style="align-items:center;">
+            <div id="heroRing"></div>
+            <div class="stack gap-8" style="flex:1;margin-left:20px;">
+              <div class="cat-row" style="padding:4px 0;"><span class="cat-name" style="width:100px;font-size:12.5px;">Roads</span><div class="cat-track"><div class="cat-fill" style="width:78%;background:var(--orange);"></div></div><span class="cat-score" style="font-size:12px;">78</span></div>
+              <div class="cat-row" style="padding:4px 0;"><span class="cat-name" style="width:100px;font-size:12.5px;">Cleanliness</span><div class="cat-track"><div class="cat-fill" style="width:91%;background:var(--green);"></div></div><span class="cat-score" style="font-size:12px;">91</span></div>
+              <div class="cat-row" style="padding:4px 0;"><span class="cat-name" style="width:100px;font-size:12.5px;">Lighting</span><div class="cat-track"><div class="cat-fill" style="width:88%;background:var(--green);"></div></div><span class="cat-score" style="font-size:12px;">88</span></div>
+            </div>
+          </div>
+          <hr class="divider">
+          <div class="flex-between small">
+            <span class="muted">3 active issues · 18 resolved this month</span>
+            <span class="delta up">+6</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="pulse-rule"></div></div>
+
+<!-- ============ KANPUR CIVIC PULSE ============ -->
+<section class="section" id="pulse">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">Kanpur Civic Pulse</span>
+      <h2>How is Kanpur doing?</h2>
+      <p>Explore the civic health of neighbourhoods across the city — updated as citizens report, verify and resolve issues.</p>
+    </div>
+
+    <div class="grid" style="grid-template-columns:1.6fr 1fr;gap:32px;align-items:start;">
+      <div class="reveal">
+        <div class="card" style="padding:20px;">
+          <div class="flex-between mb-12" style="flex-wrap:wrap;gap:10px;">
+            <span class="small bold">View by</span>
+            <div class="flex gap-8" id="mapFilters" style="flex-wrap:wrap;"></div>
+          </div>
+          <div id="mapContainer" style="height:440px;"></div>
+          <div class="flex gap-16 mt-16 small muted" style="flex-wrap:wrap;">
+            <span class="flex gap-8" style="align-items:center;"><span style="width:10px;height:10px;border-radius:50%;background:var(--green);display:inline-block;"></span>Healthy</span>
+            <span class="flex gap-8" style="align-items:center;"><span style="width:10px;height:10px;border-radius:50%;background:var(--orange);display:inline-block;"></span>Needs Attention</span>
+            <span class="flex gap-8" style="align-items:center;"><span style="width:10px;height:10px;border-radius:50%;background:var(--red);display:inline-block;"></span>Critical</span>
+          </div>
+        </div>
+        <div class="flex-center mt-16"><a href="areas.html" class="btn btn-outline">Explore full map →</a></div>
+      </div>
+
+      <div class="stack gap-16 reveal">
+        <div class="card" style="text-align:center;">
+          <span class="tiny faint" style="text-transform:uppercase;letter-spacing:.08em;">Kanpur Civic Score</span>
+          <div class="flex-center mt-12" id="cityRing"></div>
+          <div class="delta up mt-8" style="display:inline-block;">+5 this month</div>
+        </div>
+        <div class="grid grid-2" style="gap:12px;">
+          <div class="card" style="text-align:center;padding:16px;">
+            <span class="mono bold" style="font-size:22px;">128</span>
+            <div class="tiny faint mt-8">Active Issues</div>
+          </div>
+          <div class="card" style="text-align:center;padding:16px;">
+            <span class="mono bold" style="font-size:22px;">94</span>
+            <div class="tiny faint mt-8">Resolved</div>
+          </div>
+          <div class="card" style="text-align:center;padding:16px;grid-column:1/-1;">
+            <span class="mono bold" style="font-size:22px;">642</span>
+            <div class="tiny faint mt-8">Citizens Participating</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section class="section-tight" style="background:var(--bg-raised);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+  <div class="wrap">
+    <div class="section-head reveal"><span class="eyebrow blue">The civic loop</span><h2>From noticing to knowing it's fixed</h2></div>
+    <div class="grid loop-grid" id="loopSteps"></div>
+  </div>
+</section>
+
+<!-- ============ LEADERBOARD PREVIEW ============ -->
+<section class="section">
+  <div class="wrap">
+    <div class="grid grid-2" style="gap:32px;">
+      <div class="reveal">
+        <div class="section-head" style="margin-bottom:20px;"><span class="eyebrow">Leaderboard</span><h2 style="font-size:26px;">Neighbourhoods leading the way</h2></div>
+        <div class="card stack" id="leaderList"></div>
+      </div>
+      <div class="reveal">
+        <div class="section-head" style="margin-bottom:20px;"><span class="eyebrow saffron">🇮🇳 75 years, 75 actions</span><h2 style="font-size:26px;">Azadi Civic Challenge</h2></div>
+        <div class="card">
+          <p class="muted small">Every report, verification and supported suggestion counts as one civic action toward the community's goal this Independence season.</p>
+          <div class="flex-between mt-16 mb-8">
+            <span class="mono bold" style="font-size:22px;" id="azadiCount">53 / 75</span>
+            <span class="small muted">actions</span>
+          </div>
+          <div class="cat-track" style="height:12px;"><div class="cat-fill" id="azadiBar" style="width:0%;background:linear-gradient(90deg,var(--saffron),var(--green));"></div></div>
+          <p class="tiny faint mt-16">75 actions. 75 citizens. One stronger community.</p>
+          <a href="impact.html#azadi" class="btn btn-outline btn-sm mt-12">See the challenge</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer" id="site-footer"></footer>
+<nav class="bottom-nav" id="bottom-nav"></nav>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script src="js/map.js"></script>
+<script>
+  renderChrome('home');
+
+  document.getElementById('heroRing').innerHTML = ringGauge({score:84, size:96, stroke:9, label:''});
+
+  const cityTone = scoreTone(CITY.score);
+  document.getElementById('cityRing').innerHTML = ringGauge({score:CITY.score, size:150, stroke:12, label:'/ 100'});
+
+  // map + filters
+  const filters = [
+    ["overall","Overall"], ["roads","Roads"], ["cleanliness","Cleanliness"], ["water","Water"],
+    ["greenery","Greenery"], ["lighting","Lighting"], ["traffic","Traffic"], ["accessibility","Accessibility"]
+  ];
+  const filterWrap = document.getElementById('mapFilters');
+  filterWrap.innerHTML = filters.map(([k,l],i)=>`<button class="btn btn-sm ${i===0?'btn-ghost':'btn-outline'}" data-f="${k}" style="padding:7px 13px;">${l}</button>`).join('');
+  const mapApi = renderCivicMap(document.getElementById('mapContainer'), { onSelect:(id)=> location.href = `area.html?id=${id}` });
+  filterWrap.querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      filterWrap.querySelectorAll('button').forEach(b=>{ b.classList.remove('btn-ghost'); b.classList.add('btn-outline'); });
+      btn.classList.remove('btn-outline'); btn.classList.add('btn-ghost');
+      mapApi.setFilter(btn.dataset.f);
+    });
+  });
+
+  // loop steps
+  const loop = [
+    ["Discover","See your area's civic score"],
+    ["Understand","Break it down by category"],
+    ["Report","Flag what needs attention"],
+    ["Verify","Community confirms it's real"],
+    ["Resolve","Local action gets tracked"],
+    ["Measure","Watch the score improve"]
+  ];
+  document.getElementById('loopSteps').innerHTML = loop.map((s,i)=>`
+    <div class="card reveal" style="padding:16px;text-align:center;">
+      <span class="mono faint tiny">0${i+1}</span>
+      <h4 style="font-size:14.5px;margin-top:6px;">${s[0]}</h4>
+      <p class="tiny muted mt-8">${s[1]}</p>
+    </div>`).join('');
+
+  // leaderboard preview (top 5)
+  document.getElementById('leaderList').innerHTML = LEADERBOARD.slice(0,5).map((a,i)=>`
+    <a href="area.html?id=${a.id}" class="flex-between" style="padding:12px 4px;border-bottom:1px solid var(--line-soft);text-decoration:none;color:inherit;">
+      <span class="flex gap-12" style="align-items:center;">
+        <span class="mono faint" style="width:20px;">${i+1}</span>
+        <span class="bold">${a.name}</span>
+      </span>
+      <span class="mono bold tone-${scoreTone(a.score)}">${a.score}</span>
+    </a>`).join('');
+
+  document.getElementById('azadiCount').textContent = `${STATE.azadi} / 75`;
+  document.getElementById('azadiBar').style.width = '0%';
+  requestAnimationFrame(()=> requestAnimationFrame(()=>{
+    document.getElementById('azadiBar').style.width = (STATE.azadi/75*100)+'%';
+  }));
+
+  animateRings(); initReveal();
+</script>
+</body>
+</html>
