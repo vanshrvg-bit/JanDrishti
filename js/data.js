@@ -189,7 +189,7 @@ let ISSUES = [
     area: "civil-lines", location: "Mall Road",
     confirms: 19, priority: 68, status: "verified", severity:"Moderate",
     affected: "My Neighbourhood", description: "A large section of the footpath outside the row of shops has cracked and shifted, becoming a trip hazard for pedestrians.",
-    photo: "assets/issues/footpath.jpg", resolved:false,
+    photo: "assets/issues/Footpath.jpg", resolved:false,
     timeline: ["reported","verified"]
   },
   {
